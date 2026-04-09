@@ -1,5 +1,7 @@
 # VisionStyle — Visual Style Analyzer
 
+**English** | [Русский](README.ru.md)
+
 > Feed an image → get a structured style passport in JSON and a Markdown report.
 
 Built with Python + Claude Vision API. No web services, no bloat — pure CLI tool.
