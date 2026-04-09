@@ -1,0 +1,17 @@
+# Secrets
+.env
+
+# TAUSIK runtime (DB, venv, cache)
+.tausik/
+
+# Claude generated/synced
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/

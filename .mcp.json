@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "codebase-rag": {
+      "command": "C:/WORK/VisionStyle/.tausik/venv/Scripts/python.exe",
+      "args": [
+        "C:/WORK/VisionStyle/.claude/mcp/codebase-rag/server.py",
+        "--project",
+        "C:/WORK/VisionStyle"
+      ]
+    },
+    "tausik-project": {
+      "command": "C:/WORK/VisionStyle/.tausik/venv/Scripts/python.exe",
+      "args": [
+        "C:/WORK/VisionStyle/.claude/mcp/project/server.py",
+        "--project",
+        "C:/WORK/VisionStyle"
+      ]
+    }
+  }
+}
