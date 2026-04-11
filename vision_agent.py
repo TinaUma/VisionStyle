@@ -124,6 +124,31 @@ class OpenAICompatibleAdapter(VisionProvider):
         return response.choices[0].message.content
 
 
+def analyze_style(image_b64: str, media_type: str, provider: VisionProvider | None = None) -> str:
+    """Отправить изображение на анализ стиля и вернуть сырой ответ модели.
+
+    Args:
+        image_b64: изображение в base64
+        media_type: MIME-тип ("image/jpeg", "image/png", "image/webp")
+        provider: провайдер (если None — создаётся через get_provider())
+
+    Returns:
+        Сырой текст ответа модели (JSON или JSON в ```json блоке)
+
+    Raises:
+        ValueError: если ответ модели пустой
+    """
+    from style_parser import STYLE_ANALYSIS_PROMPT
+
+    p = provider or get_provider()
+    result = p.analyze(image_b64, media_type, STYLE_ANALYSIS_PROMPT)
+
+    if not result or not result.strip():
+        raise ValueError("Получен пустой ответ от модели. Проверь API-ключ и лимиты.")
+
+    return result
+
+
 def get_provider(
     provider: str | None = None,
     model: str | None = None,
