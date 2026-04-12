@@ -1,3 +1,12 @@
+---
+title: VisionStyle
+emoji: 🎨
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+pinned: false
+---
+
 # VisionStyle — Visual Style Analyzer
 
 **English** | [Русский](README.ru.md)
