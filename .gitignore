@@ -7,6 +7,12 @@
 # Claude generated/synced
 .claude/
 
+# Generated reports
+report.*
+tests/sample_*
+tests/*.json
+tests/*.md
+
 # Python
 __pycache__/
 *.pyc

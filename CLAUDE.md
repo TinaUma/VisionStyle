@@ -32,5 +32,5 @@ See `.claude/references/skill-catalog.md` for the full catalog with trigger keyw
 <!-- DYNAMIC:START -->
 ## Current State
 Session: none | Branch: main | Version: 1.0.0
-Tasks: 6/8 done, 0 active, 0 blocked
+Tasks: 8/8 done, 0 active, 0 blocked
 <!-- DYNAMIC:END -->
