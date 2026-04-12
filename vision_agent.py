@@ -124,7 +124,7 @@ class OpenAICompatibleAdapter(VisionProvider):
         return response.choices[0].message.content
 
 
-def analyze_style(image_b64: str, media_type: str, provider: VisionProvider | None = None) -> str:
+def analyze_style(image_b64: str, media_type: str, provider: VisionProvider | None = None, api_key: str | None = None) -> str:
     """Отправить изображение на анализ стиля и вернуть сырой ответ модели.
 
     Args:
@@ -140,7 +140,7 @@ def analyze_style(image_b64: str, media_type: str, provider: VisionProvider | No
     """
     from style_parser import STYLE_ANALYSIS_PROMPT
 
-    p = provider or get_provider()
+    p = provider or get_provider(api_key=api_key)
     result = p.analyze(image_b64, media_type, STYLE_ANALYSIS_PROMPT)
 
     if not result or not result.strip():
@@ -152,6 +152,7 @@ def analyze_style(image_b64: str, media_type: str, provider: VisionProvider | No
 def get_provider(
     provider: str | None = None,
     model: str | None = None,
+    api_key: str | None = None,
 ) -> VisionProvider:
     """Фабрика: создать адаптер по имени провайдера.
 
@@ -164,9 +165,9 @@ def get_provider(
     mdl = model or os.environ.get("VISION_MODEL")
 
     if name == "anthropic":
-        return AnthropicAdapter(model=mdl)
+        return AnthropicAdapter(model=mdl, api_key=api_key)
     elif name in ("openai", "groq", "together"):
-        return OpenAICompatibleAdapter(provider=name, model=mdl)
+        return OpenAICompatibleAdapter(provider=name, model=mdl, api_key=api_key)
     else:
         raise ValueError(
             f"Неизвестный провайдер: '{name}'. "

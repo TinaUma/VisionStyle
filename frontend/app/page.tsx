@@ -1,16 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const STORAGE_KEY = "visionstyle_api_key";
 
 interface AnalysisResult {
-  image: {
-    filename: string;
-    width: number;
-    height: number;
-    format: string;
-  };
+  image: { filename: string; width: number; height: number; format: string };
   analysis: {
     style: string;
     palette: string[];
@@ -22,6 +18,8 @@ interface AnalysisResult {
 }
 
 export default function Home() {
+  const [apiKey, setApiKey] = useState("");
+  const [keySaved, setKeySaved] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -29,16 +27,27 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) { setApiKey(saved); setKeySaved(true); }
+  }, []);
+
+  function saveKey() {
+    localStorage.setItem(STORAGE_KEY, apiKey.trim());
+    setKeySaved(true);
+  }
+
+  function clearKey() {
+    localStorage.removeItem(STORAGE_KEY);
+    setApiKey("");
+    setKeySaved(false);
+  }
+
   function handleFile(f: File) {
     setFile(f);
     setResult(null);
     setError(null);
     setPreview(URL.createObjectURL(f));
-  }
-
-  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (f) handleFile(f);
   }
 
   function onDrop(e: React.DragEvent) {
@@ -48,13 +57,17 @@ export default function Home() {
   }
 
   async function analyze() {
-    if (!file) return;
+    if (!file || !apiKey.trim()) return;
     setLoading(true);
     setError(null);
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch(`${API_URL}/analyze`, { method: "POST", body: form });
+      const res = await fetch(`${API_URL}/analyze`, {
+        method: "POST",
+        body: form,
+        headers: { "X-API-Key": apiKey.trim() },
+      });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.detail ?? `Ошибка ${res.status}`);
@@ -73,6 +86,45 @@ export default function Home() {
       <p className="text-gray-400 mb-10 text-center max-w-md">
         Загрузи фото — получи структурированный паспорт стиля
       </p>
+
+      {/* API Key block */}
+      <div className="w-full max-w-lg mb-8 bg-gray-900 rounded-2xl p-5">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase mb-3">
+          Anthropic API Key
+        </h3>
+        {keySaved ? (
+          <div className="flex items-center justify-between">
+            <span className="text-green-400 text-sm">✓ Ключ сохранён</span>
+            <button
+              onClick={clearKey}
+              className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+            >
+              Сменить
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              type="password"
+              placeholder="sk-ant-api03-..."
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && saveKey()}
+              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 font-mono"
+            />
+            <button
+              onClick={saveKey}
+              disabled={!apiKey.trim()}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 rounded-lg text-sm font-semibold transition-colors"
+            >
+              Сохранить
+            </button>
+          </div>
+        )}
+        <p className="text-xs text-gray-600 mt-2">
+          Ключ хранится только в твоём браузере и никуда не передаётся кроме Anthropic API.
+        </p>
+      </div>
 
       {/* Upload zone */}
       <div
@@ -96,15 +148,16 @@ export default function Home() {
           type="file"
           accept="image/jpeg,image/png,image/webp"
           className="hidden"
-          onChange={onFileChange}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
         />
       </div>
 
       {file && (
         <button
           onClick={analyze}
-          disabled={loading}
+          disabled={loading || !apiKey.trim()}
           className="mt-6 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 rounded-xl font-semibold transition-colors"
+          title={!apiKey.trim() ? "Сначала введи API ключ" : ""}
         >
           {loading ? "Анализирую..." : "Анализировать стиль"}
         </button>
@@ -128,10 +181,7 @@ export default function Home() {
             <div className="flex gap-3 flex-wrap">
               {result.analysis.palette.map((hex) => (
                 <div key={hex} className="flex flex-col items-center gap-1">
-                  <div
-                    className="w-10 h-10 rounded-lg border border-gray-700"
-                    style={{ backgroundColor: hex }}
-                  />
+                  <div className="w-10 h-10 rounded-lg border border-gray-700" style={{ backgroundColor: hex }} />
                   <span className="text-xs text-gray-500">{hex}</span>
                 </div>
               ))}
@@ -160,7 +210,8 @@ export default function Home() {
               {result.analysis.materials.map((m) => (
                 <span key={m} className="px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-sm text-gray-300">
                   {m}
-                </span>              ))}
+                </span>
+              ))}
             </div>
           </div>
         </div>
