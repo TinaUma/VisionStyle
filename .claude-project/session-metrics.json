@@ -1,0 +1,10 @@
+{
+  "tokens_input": 671,
+  "tokens_output": 51388,
+  "tokens_total": 52059,
+  "cost_usd": 0.7728,
+  "tool_calls": 241,
+  "model": "claude-sonnet-4-6",
+  "messages": 387,
+  "duration_sec": 93289
+}
