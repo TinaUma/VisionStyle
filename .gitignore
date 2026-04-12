@@ -33,3 +33,7 @@ frontend/.env*.local
 *.jpeg
 *.png
 *.webp
+
+# But keep printscreen folder (project screenshots for README/portfolio)
+!printscreen/
+!printscreen/**

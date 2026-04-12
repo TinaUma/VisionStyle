@@ -13,6 +13,12 @@ pinned: false
 
 > Upload a photo → get a structured visual style passport: colors, mood, materials, keywords.
 
+## Live Demo
+
+**[https://tinaume-visionstyle.hf.space](https://tinaume-visionstyle.hf.space)**
+
+![VisionStyle demo — fruit board analysis](printscreen/avocado%20deployHuggingface.PNG)
+
 Built with Python + FastAPI + Next.js + Claude Vision API.
 
 ## What it does
