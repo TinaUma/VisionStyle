@@ -1,0 +1,29 @@
+# Git submodule (не нужен в Docker)
+.tausik-lib/
+.tausik/
+
+# Dev окружение
+.env
+.claude/
+.claude-project/
+
+# Python кэш
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Frontend зависимости и dev-сборка
+frontend/node_modules/
+frontend/.next/
+
+# Тесты и документация
+tests/
+docs/
+
+# Репорты
+report.*
+*.jpg
+*.jpeg
+*.png
+*.webp
+ПРИНТСКРИН/
