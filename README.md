@@ -2,9 +2,9 @@
 
 **English** | [Русский](README.ru.md)
 
-> Feed an image → get a structured style passport in JSON and a Markdown report.
+> Upload a photo → get a structured visual style passport: colors, mood, materials, keywords.
 
-Built with Python + Claude Vision API. No web services, no bloat — pure CLI tool.
+Built with Python + FastAPI + Next.js + Claude Vision API.
 
 ## What it does
 
@@ -12,14 +12,14 @@ VisionStyle analyzes any JPG, PNG, or WebP image and extracts:
 
 | Field | Description |
 |-------|-------------|
-| **style** | One-phrase visual style (e.g. "Scandinavian minimalism") |
-| **palette** | 5+ dominant colors as HEX codes |
-| **materials** | Detected materials (wood, metal, linen…) |
-| **mood** | Emotional tone (calm, bold, playful…) |
-| **keywords** | Style descriptors |
+| **style** | One-phrase visual style (e.g. "Dark moody food photography") |
+| **palette** | 5+ dominant colors as HEX swatches |
+| **materials** | Detected materials (wood, ceramic, linen…) |
+| **mood** | Emotional tone of the image |
+| **keywords** | Style descriptors as tags |
 | **verdict** | One sentence: why it looks the way it does |
 
-## Quick Start
+## Quick Start (Web App)
 
 ```bash
 # 1. Clone
@@ -27,63 +27,75 @@ git clone https://github.com/TinaUma/VisionStyle.git
 cd VisionStyle
 git submodule update --init
 
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Configure API key
+# 2. Configure API key
 cp .env.example .env
-# Edit .env and set your ANTHROPIC_API_KEY
+# Edit .env → set ANTHROPIC_API_KEY
 
-# 4. Run
+# 3. Start backend
+pip install -r requirements.txt -r backend/requirements.txt
+uvicorn backend.main:app --reload
+# → http://localhost:8000
+
+# 4. Start frontend (new terminal)
+cd frontend
+npm install
+npm run dev
+# → http://localhost:3000
+```
+
+Open **http://localhost:3000**, drop a photo, click **Analyze**.
+
+## Quick Start (CLI)
+
+```bash
 python vision_cli.py --image photo.jpg --output report
 ```
 
 Output: `report.json` + `report.md`
 
+## Architecture
+
+```
+VisionStyle/
+├── backend/             ← FastAPI (REST API)
+│   └── main.py          ← POST /analyze, GET /health
+├── frontend/            ← Next.js 16 + Tailwind CSS
+│   └── app/page.tsx     ← Upload UI + results display
+├── image_processor.py   ← load, resize to 1200px, base64
+├── vision_agent.py      ← VisionProvider adapter (multi-provider)
+├── style_parser.py      ← extract StyleAnalysis from LLM response
+├── exporter.py          ← write report.json and report.md
+└── vision_cli.py        ← CLI entry point
+```
+
 ## Multi-provider support
 
-VisionStyle works with multiple vision providers via a unified adapter:
-
-| Provider | Set `VISION_PROVIDER=` | Requires |
-|----------|----------------------|---------|
+| Provider | `VISION_PROVIDER=` | Requires |
+|----------|--------------------|---------|
 | Claude (Anthropic) | `anthropic` | `ANTHROPIC_API_KEY` |
 | OpenAI GPT-4o | `openai` | `OPENAI_API_KEY` |
 | Groq (Llama Vision) | `groq` | `GROQ_API_KEY` |
 | Together AI | `together` | `TOGETHER_API_KEY` |
 
-Switch providers in `.env`:
-```env
-VISION_PROVIDER=anthropic
-VISION_MODEL=claude-haiku-4-5-20251001
-```
-
 See [docs/vision_research.md](docs/vision_research.md) for full provider comparison.
-
-## Project structure
-
-```
-vision_cli.py        ← entry point (--image, --output)
-├── image_processor.py  ← load, resize to 1200px, base64
-├── vision_agent.py     ← VisionProvider adapter (Anthropic / OpenAI-compatible)
-├── style_parser.py     ← extract StyleAnalysis from LLM response
-└── exporter.py         ← write report.json and report.md
-```
 
 ## Stack
 
-- Python 3.11+
-- [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-python) / [OpenAI SDK](https://github.com/openai/openai-python)
-- [Pillow](https://python-pillow.org/) for image processing
-- Dev workflow: [TAUSIK framework](https://github.com/Kibertum/SENAR)
+- **Backend:** Python 3.11+, FastAPI, Uvicorn
+- **Frontend:** Next.js 16, React, Tailwind CSS, TypeScript
+- **AI:** Anthropic Claude Vision API (claude-haiku-4-5-20251001)
+- **Image processing:** Pillow
+- **Dev workflow:** [TAUSIK framework](https://gitlab.yumash.ru/tausik/core)
 
 ## Development status
 
 | Sprint | Status | Description |
 |--------|--------|-------------|
-| Sprint 0 | ✅ Done | CLI scaffold, API connectivity check |
+| Sprint 0 | ✅ Done | CLI scaffold, API connectivity |
 | Sprint 1 | ✅ Done | Image pipeline + multi-provider adapter |
-| Sprint 2 | 🔄 In progress | Vision logic + JSON parsing |
-| Sprint 3 | ⏳ Planned | Export to JSON + Markdown |
+| Sprint 2 | ✅ Done | Vision logic + JSON parsing |
+| Sprint 3 | ✅ Done | CLI export to JSON + Markdown |
+| Sprint 4 | 🔄 In progress | Web app: FastAPI + Next.js |
 
 ## License
 
