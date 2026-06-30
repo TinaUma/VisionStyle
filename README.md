@@ -15,7 +15,7 @@ pinned: false
 
 ## Live Demo
 
-**[https://tinaume-visionstyle.hf.space](https://tinaume-visionstyle.hf.space)**
+**[https://tinauma-visionstyle.hf.space](https://tinauma-visionstyle.hf.space)**
 
 ![VisionStyle demo — fruit board analysis](printscreen/avocado%20deployHuggingface.PNG)
 
